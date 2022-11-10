@@ -6,4 +6,5 @@
     <string name="decrement_by_n">- %s</string>
     <string name="increment_by_n">+ %s</string>
     <string name="tip_input_label">Tip [%]</string>
+    <string name="round_the_tip">Round the tip</string>
 </resources>

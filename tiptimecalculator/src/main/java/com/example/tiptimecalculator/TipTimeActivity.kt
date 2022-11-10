@@ -7,16 +7,15 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tiptimecalculator.ui.theme.TrainingIntroTheme
 import java.text.NumberFormat
+import kotlin.math.ceil
 
 // Custom tip calculator
 class TipTimeActivity : ComponentActivity() {
@@ -39,7 +39,7 @@ class TipTimeActivity : ComponentActivity() {
 }
 
 @Composable
-fun TipTimeScreen(){
+fun TipTimeScreen() {
     var amountInput by remember {
         mutableStateOf("")
     }
@@ -47,8 +47,13 @@ fun TipTimeScreen(){
     var tipInput by remember {
         mutableStateOf("")
     }
+
+    var roundUp by remember {
+        mutableStateOf(false)
+    }
+
     var tipPercent = tipInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount, tipPercent)
+    val tip = calculateTip(amount, tipPercent, roundUp)
 
     val focusManager = LocalFocusManager.current
     Column(
@@ -77,11 +82,13 @@ fun TipTimeScreen(){
         Spacer(modifier = Modifier.height(24.dp))
         EditTipPercentage(
             tipInput = tipInput,
-            onValueChange = { tipInput = it},
+            onValueChange = { tipInput = it },
             onDecrement = { tipPercent -= 5 },
             onIncrement = { tipPercent += 5 },
             focusManager = focusManager
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        RoundTheTipRow(roundUp = roundUp, onRoundUpChange = {roundUp = it})
         Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = stringResource(id = R.string.tip_amount, tip),
@@ -94,13 +101,13 @@ fun TipTimeScreen(){
 
 @Composable
 fun EditNumberField(
-    @StringRes label : Int,
-    value : String,
-    onValueChange : (String) -> Unit,
-    keyboardOptions : KeyboardOptions,
+    @StringRes label: Int,
+    value: String,
+    onValueChange: (String) -> Unit,
+    keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
     modifier: Modifier = Modifier
-){
+) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -114,19 +121,22 @@ fun EditNumberField(
 
 @Composable
 fun EditTipPercentage(
-    tipInput : String,
+    tipInput: String,
     onValueChange: (String) -> Unit,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
-    focusManager : FocusManager,
+    focusManager: FocusManager,
     modifier: Modifier = Modifier
-){
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(onClick = onDecrement,
-            modifier = modifier.weight(1f).height(IntrinsicSize.Max)
+        Button(
+            onClick = onDecrement,
+            modifier = modifier
+                .weight(1f)
+                .height(IntrinsicSize.Max)
         ) {
             Text(text = stringResource(id = R.string.decrement_by_n, "5"))
         }
@@ -153,7 +163,9 @@ fun EditTipPercentage(
         )*/
         Button(
             onClick = onIncrement,
-            modifier = modifier.weight(1f).height(IntrinsicSize.Max)
+            modifier = modifier
+                .weight(1f)
+                .height(IntrinsicSize.Max)
         ) {
             Text(text = stringResource(id = R.string.increment_by_n, "5"))
         }
@@ -162,10 +174,37 @@ fun EditTipPercentage(
 
 private fun calculateTip(
     amount: Double,
-    tipPercent: Double = 15.0
-) : String {
-    val tip = tipPercent / 100 * amount
+    tipPercent: Double = 15.0,
+    roundUp: Boolean
+): String {
+    var tip = tipPercent / 100 * amount
+    if (roundUp)
+        tip = ceil(tip)
     return NumberFormat.getCurrencyInstance().format(tip)
+}
+
+@Composable
+fun RoundTheTipRow(
+    roundUp: Boolean,
+    onRoundUpChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .size(48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = stringResource(id = R.string.round_the_tip))
+        Switch(
+            checked = roundUp,
+            onCheckedChange = onRoundUpChange,
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.End),
+            colors = SwitchDefaults.colors(uncheckedThumbColor = Color.DarkGray)
+        )
+    }
 }
 
 @Preview(showBackground = true)
