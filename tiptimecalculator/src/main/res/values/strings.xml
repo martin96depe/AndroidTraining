@@ -5,4 +5,5 @@
     <string name="tip_amount">Tip Amount: %s</string>
     <string name="decrement_by_n">- %s</string>
     <string name="increment_by_n">+ %s</string>
+    <string name="tip_input_label">Tip [%]</string>
 </resources>
