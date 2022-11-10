@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.tiptimecalculator.ui.theme.TrainingIntroTheme
 import java.text.NumberFormat
 
+// Custom tip calculator
 class TipTimeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
