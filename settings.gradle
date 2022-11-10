@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "TrainingIntro"
+include ':app'
+include ':composearticle'
+include ':taskmanager'
+include ':composequadrant'
+include ':businesscard'
+include ':diceroller'
+include ':lemonade'
+include ':tiptimecalculator'
