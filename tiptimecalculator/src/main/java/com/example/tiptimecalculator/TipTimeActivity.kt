@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,20 +41,32 @@ class TipTimeActivity : ComponentActivity() {
 
 @Composable
 fun TipTimeScreen() {
-    var amountInput by remember {
-        mutableStateOf("")
-    }
+    /** -- State variables -- */
+    var amountInput by remember { mutableStateOf("") }
+    var tipInput by remember { mutableStateOf("") }
+    var roundUp by remember { mutableStateOf(false) }
+    var plusEnable by remember { mutableStateOf((true)) }
+    var minusEnable by remember { mutableStateOf(false) }
+
+    /** -- variables -- */
     val amount = amountInput.toDoubleOrNull() ?: 0.0
-    var tipInput by remember {
-        mutableStateOf("")
-    }
-
-    var roundUp by remember {
-        mutableStateOf(false)
-    }
-
     var tipPercent = tipInput.toDoubleOrNull() ?: 0.0
     val tip = calculateTip(amount, tipPercent, roundUp)
+
+    when (tipPercent) {
+        100.0 -> {
+            plusEnable = false
+            minusEnable = true
+        }
+        0.0 -> {
+            plusEnable = true
+            minusEnable = false
+        }
+        else -> {
+            plusEnable = true
+            minusEnable = true
+        }
+    }
 
     val focusManager = LocalFocusManager.current
     Column(
@@ -82,10 +95,33 @@ fun TipTimeScreen() {
         Spacer(modifier = Modifier.height(24.dp))
         EditTipPercentage(
             tipInput = tipInput,
-            onValueChange = { tipInput = it },
-            onDecrement = { tipPercent -= 5 },
-            onIncrement = { tipPercent += 5 },
-            focusManager = focusManager
+            onValueChange = {
+                val input = it.toDoubleOrNull()?: 0.0
+                if (input in (0.0 .. 100.0)){
+                    tipInput = it
+                }else if (input < 0.0) {
+                    tipInput = "0.0"
+                }else if (input > 100.0){
+                    tipInput = "100.0"
+                }
+            },
+            onDecrement = {
+                tipInput = if (tipPercent > 0.0) {
+                    (tipPercent - 5).toString()
+                } else {
+                    "0.0"
+                }
+            },
+            onIncrement = {
+                tipInput = if (tipPercent < 100.0) {
+                    (tipPercent + 5).toString()
+                } else {
+                    "100.0"
+                }
+            },
+            focusManager = focusManager,
+            plusEnable = plusEnable,
+            minusEnable = minusEnable
         )
         Spacer(modifier = Modifier.height(8.dp))
         RoundTheTipRow(roundUp = roundUp, onRoundUpChange = {roundUp = it})
@@ -125,6 +161,8 @@ fun EditTipPercentage(
     onValueChange: (String) -> Unit,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
+    plusEnable: Boolean,
+    minusEnable: Boolean,
     focusManager: FocusManager,
     modifier: Modifier = Modifier
 ) {
@@ -134,6 +172,7 @@ fun EditTipPercentage(
     ) {
         Button(
             onClick = onDecrement,
+            enabled = minusEnable,
             modifier = modifier
                 .weight(1f)
                 .height(IntrinsicSize.Max)
@@ -153,16 +192,9 @@ fun EditTipPercentage(
             }),
             modifier = modifier.weight(2f)
         )
-        /*OutlinedTextField(
-            value = tipInput,
-            onValueChange = onValueChange,
-            label = { Text(text = "Tip Percentage [%]") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.weight(2f)
-        )*/
         Button(
             onClick = onIncrement,
+            enabled = plusEnable,
             modifier = modifier
                 .weight(1f)
                 .height(IntrinsicSize.Max)
@@ -172,7 +204,8 @@ fun EditTipPercentage(
     }
 }
 
-private fun calculateTip(
+@VisibleForTesting
+internal fun calculateTip(
     amount: Double,
     tipPercent: Double = 15.0,
     roundUp: Boolean
