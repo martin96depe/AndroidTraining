@@ -1,4 +1,4 @@
-tipackage com.example.scrolllist
+package com.example.scrolllist
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
