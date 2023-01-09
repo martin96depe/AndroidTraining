@@ -1,4 +1,4 @@
-package com.example.scrolllist.ui.theme
+package com.example.grid.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

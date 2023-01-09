@@ -1,4 +1,4 @@
-package com.example.scrolllist
+package com.example.grid
 
 import org.junit.Test
 

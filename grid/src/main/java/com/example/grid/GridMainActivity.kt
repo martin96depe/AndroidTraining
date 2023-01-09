@@ -1,4 +1,4 @@
-tipackage com.example.scrolllist
+package com.example.grid
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,9 +10,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.scrolllist.ui.theme.TrainingIntroTheme
+import com.example.grid.ui.theme.TrainingIntroTheme
 
-class SrcrollListActivity : ComponentActivity() {
+class GridMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

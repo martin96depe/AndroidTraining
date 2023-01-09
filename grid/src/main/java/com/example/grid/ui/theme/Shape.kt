@@ -1,4 +1,4 @@
-package com.example.scrolllist.ui.theme
+package com.example.grid.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
